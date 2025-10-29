@@ -4,9 +4,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer
 
 class RegisterView( CreateAPIView ):
     queryset = User.objects.all()
@@ -20,6 +21,7 @@ class RegisterView( CreateAPIView ):
         user = serializer.save()
 
         refresh_token = RefreshToken.for_user( user )
+        refresh_token[ "role" ] = user.role
 
         return Response({
             "user": {
@@ -31,3 +33,6 @@ class RegisterView( CreateAPIView ):
             "access": str( refresh_token.access_token ),
             "refresh": str( refresh_token )
         }, status = status.HTTP_201_CREATED )
+
+class LoginView( TokenObtainPairView ):
+    serializer_class = UserLoginSerializer
