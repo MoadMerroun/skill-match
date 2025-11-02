@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+venv/
+env/
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Environment files
+.env
+
+# IDEs / editors
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+*.log
+
+# Migrations (optional, if you plan to regenerate them in container)
+# */migrations/
+
+# Static and media files (if using S3)
+staticfiles/
+media/
