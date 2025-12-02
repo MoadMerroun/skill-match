@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from profiles.models import CandidateProfile, CompanyProfile
 from .models import User
 from .serializers import UserRegisterSerializer, UserLoginSerializer
 
@@ -19,6 +20,12 @@ class RegisterView( CreateAPIView ):
         serializer.is_valid( raise_exception = True )
 
         user = serializer.save()
+
+        if user.role == "candidate":
+            CandidateProfile.objects.create( user = user )
+
+        else:
+            CompanyProfile.objects.create( user = user )
 
         refresh_token = RefreshToken.for_user( user )
         refresh_token[ "role" ] = user.role
