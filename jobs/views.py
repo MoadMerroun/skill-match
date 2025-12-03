@@ -2,15 +2,32 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from profiles.models import CandidateProfile
 from profiles.serializers import CandidateProfileSerializer
+from common.permissions import IsCandidate, IsEmployer, IsJobOwner
 from .models import Job, JobApplication
 from .serializers import JobSerializer
 
 class JobView( ModelViewSet ):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
+
+    def get_permissions( self ):
+        if self.action in [ "apply", "my_applications" ]:
+            permission_classes = [ IsAuthenticated, IsCandidate ]
+
+        elif self.action in [ "update", "partial_update", "destroy", "applications" ]:
+            permission_classes = [ IsAuthenticated, IsEmployer, IsJobOwner ]
+
+        elif self.action in [ "create" ]:
+            permission_classes = [ IsAuthenticated, IsEmployer ]
+
+        else:
+            permission_classes = []
+
+        return [ permission() for permission in permission_classes ]
 
     def perform_create( self, serializer ):
         serializer.save( recruiter = self.request.user )
@@ -38,7 +55,7 @@ class JobView( ModelViewSet ):
 
         serializer = CandidateProfileSerializer( profiles, many = True )
 
-                return Response( serializer.data, status = status.HTTP_200_OK )
+        return Response( serializer.data, status = status.HTTP_200_OK )
 
     def my_applications( self, request ):
         user = request.user
