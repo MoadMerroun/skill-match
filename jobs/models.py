@@ -7,3 +7,14 @@ class Job( models.Model ):
     recruiter = models.ForeignKey( "accounts.User", on_delete = models.CASCADE, related_name="jobs", limit_choices_to={ "role": "employer" } )
     created_at = models.DateTimeField( auto_now_add = True )
     updated_at = models.DateTimeField( auto_now = True )
+
+
+class JobApplication( models.Model ):
+    job = models.ForeignKey( Job, on_delete = models.CASCADE, related_name = "applications" )
+    applicant = models.ForeignKey( "accounts.User", on_delete = models.CASCADE, related_name = "job_applications", limit_choices_to={ "role": "candidate" } )
+    created_at = models.DateTimeField( auto_now_add = True )
+    updated_at = models.DateTimeField( auto_now = True )
+
+    class Meta:
+        unique_together = ( "job", "applicant" )
+        ordering = [ "-created_at" ]
