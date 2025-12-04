@@ -38,4 +38,15 @@ class JobView( ModelViewSet ):
 
         serializer = CandidateProfileSerializer( profiles, many = True )
 
+                return Response( serializer.data, status = status.HTTP_200_OK )
+
+    def my_applications( self, request ):
+        user = request.user
+
+        applications = JobApplication.objects.filter( applicant = user )
+
+        jobs = Job.objects.filter( id__in = applications.values_list( 'job', flat = True ) )
+
+        serializer = JobSerializer( jobs, many = True )
+
         return Response( serializer.data, status = status.HTTP_200_OK )
